@@ -1,4 +1,4 @@
--- Creación de modelo SQL para un minimarket
+-- Creación de modelo SQL para un minimarket (tablas)
 
 CREATE TABLE MVCD_REGIONES(
     ID_REGION NUMBER,
