@@ -1622,24 +1622,55 @@ BEGIN
 END;
 /
 --Reporte de la cantidad de dinero que salio en total del negocio
-CREATE OR REPLACE PROCEDURE MVCD_REPORTE_PAGO_PROVEEDOR (p_cursor OUT SYS_REFCURSOR) AS
+create or replace PROCEDURE MVCD_REPORTE_PAGO_PROVEEDOR (
+    FECHA_PAGO_PROVEEDOR_P IN DATE,
+    p_cursor OUT SYS_REFCURSOR
+) AS
 BEGIN
     OPEN p_cursor FOR
         SELECT SUM(MONTO_PAGO_PROVEEDOR)
-        FROM MVCD_PAGO_PROVEEDOR;
+        FROM MVCD_PAGO_PROVEEDOR
+        WHERE FECHA_PAGO_PROVEEDOR BETWEEN FECHA_PAGO_PROVEEDOR_P AND SYSDATE; -- Compara la fecha proporcionada con la columna de fechas
 END;
 /
 --Reporte de la cantidad de dinero que entro al negocio en total
-CREATE OR REPLACE PROCEDURE MVCD_REPORTE_PAGO_CLIENTE (p_cursor OUT SYS_REFCURSOR) AS
+create or replace PROCEDURE MVCD_REPORTE_PAGO_CLIENTE (
+    FECHA_PAGO_CLIENTE_P IN DATE,
+    p_cursor OUT SYS_REFCURSOR
+) AS
 BEGIN
     OPEN p_cursor FOR
         SELECT SUM(MONTO_PAGO_CLIENTE)
-        FROM MVCD_PAGO_CLIENTE;
+        FROM MVCD_PAGO_CLIENTE
+        WHERE FECHA_PAGO_CLIENTE BETWEEN FECHA_PAGO_CLIENTE_P AND SYSDATE; -- Compara la fecha proporcionada con la columna de fechas
 END;
 /
 
 
 
+--Reporte de ventas, puede o no especificarse un id
 
 
 
+
+create or replace PROCEDURE MVCD_REPORTE_PAGO_VENTAS (p_cursor OUT SYS_REFCURSOR,ID_CABECERA_VENTA_P IN NUMBER) AS
+BEGIN
+
+    IF (ID_CABECERA_VENTA_P = -1) THEN
+        OPEN p_cursor FOR
+            select H.id_cabecera_venta as "Cabecera" , H.fecha_venta, H.total_venta, h.id_trabajador, h.id_cliente, C.cantidad_venta, P.nombre_producto 
+            from mvcd_cabecera_venta H 
+            join mvcd_cuerpo_venta C on (H.id_Cabecera_venta = c.id_cabecera_venta)
+            join mvcd_productos P on (P.id_producto = C.id_producto)
+            order by H.id_cabecera_venta; 
+
+    ELSE
+        OPEN p_cursor FOR
+            select H.id_cabecera_venta as "Cabecera" , H.fecha_venta, H.total_venta, h.id_trabajador, h.id_cliente, C.cantidad_venta, P.nombre_producto 
+            from mvcd_cabecera_venta H 
+            join mvcd_cuerpo_venta C on (H.id_Cabecera_venta = c.id_cabecera_venta)
+            join mvcd_productos P on (P.id_producto = C.id_producto)
+            WHERE H.id_cabecera_venta = ID_CABECERA_VENTA_P
+            order by H.id_cabecera_venta;
+    END IF;
+END;
