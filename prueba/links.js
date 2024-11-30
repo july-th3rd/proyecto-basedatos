@@ -64,6 +64,9 @@ function func2(){
 function func3(){
     location.href = "func3.php"
 }
+function func4(){
+    location.href = "func4.php"
+}
 function realizarVenta(){
     location.href = "realizarVenta.php"
 }

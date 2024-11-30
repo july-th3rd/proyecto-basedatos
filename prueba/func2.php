@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'listar') {
         $dsn = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$host)(PORT=$port))(CONNECT_DATA=(SID=$dbname)))";
-
+        
         // Conexión a Oracle
         $conn = oci_connect($username, $password, $dsn);
         if (!$conn) {
@@ -19,17 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Error de conexión: " . $e['message'];
             exit;
         }
-
+        $fecha = date('d-M-Y', strtotime($_POST['fecha']));
         // Llamada al procedimiento almacenado
-        $sql = "BEGIN MVCD_REPORTE_PAGO_CLIENTE(:p_cursor); END;";
+        $sql = "BEGIN MVCD_REPORTE_PAGO_CLIENTE(:fecha,:p_cursor); END;";
         $stid = oci_parse($conn, $sql);
-
+        oci_bind_by_name($stid, ":fecha", $fecha);
         // Crear cursor
         $cursor = oci_new_cursor($conn);
 
         // Vincular el cursor al procedimiento
         oci_bind_by_name($stid, ":p_cursor", $cursor, -1, OCI_B_CURSOR);
-
         // Ejecutar el procedimiento
         if (!oci_execute($stid)) {
             $e = oci_error($stid);
@@ -46,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Mostrar resultados en una tabla HTML
         echo "<table id ='tableContainer' border='1'>";
-        echo "<tr><th>DINERO TOTAL INGRESADO</th></tr>";
+        echo "<tr><th>DINERO TOTAL INGRESADO DESDE LA FECHA $fecha</th></tr>";
         while ($row = oci_fetch_assoc($cursor)) {
             echo "<tr>";
             echo "<td>" . htmlspecialchars($row['SUM(MONTO_PAGO_CLIENTE)']) . "</td>";
@@ -73,26 +72,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <h1>REPORTE DE PAGOS CLIENTE</h1>
     <div class="button-container">
-        <button id  = "listar" onclick="submitForm('listar')">Listar</button>
+        <button id  = "listar" onclick="showForm('filtrar')">Filtrar</button>
         <a href="admin.html"><button id = "volver">Volver</button></a>
     </div>
     <div id="formContainer"></div>
     <div id="output"></div>
 
     <script>
-        function submitForm(action) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'func2.php';
-
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'action';
-            input.value = action;
-            form.appendChild(input);
-
-            document.body.appendChild(form);
-            form.submit();
+        function showForm(action) {
+            const container = document.getElementById('formContainer');
+            let html = '';
+            if (action === 'filtrar') {
+                html = `
+                    <form method="POST" action="func2.php">
+                        <input type="hidden" name="action" value="listar">
+                        <label>Fecha desde la que se quiere filtrar:</label>
+                        <input type="date" name="fecha" required>
+                        <button type="submit">Filtrar</button>
+                    </form>
+                `;
+            }
+            container.innerHTML = html;
         }
     </script>
 </body>

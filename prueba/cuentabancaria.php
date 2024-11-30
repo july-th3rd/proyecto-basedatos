@@ -19,11 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
     if ($action === 'insertar') {
+        $rut = $_POST['rut'];
         $tipo_cuenta_bancaria = $_POST['tipo_cuenta_bancaria'];
         $nro_cuenta_bancaria = $_POST['nro_cuenta_bancaria'];
         $nombre_banco = $_POST['nombre_banco'];
         $id_trabajador = $_POST['id_trabajador'];
-        $stmt = $conn->prepare("BEGIN MVCD_C_CUENTA_BANCARIA(:tipo_cuenta_bancaria,:nro_cuenta_bancaria,:nombre_banco,:id_trabajador); END;");
+        $stmt = $conn->prepare("BEGIN MVCD_C_CUENTA_BANCARIA(:rut,:tipo_cuenta_bancaria,:nro_cuenta_bancaria,:nombre_banco,:id_trabajador); END;");
+        $stmt->bindParam(':rut', $rut);
         $stmt->bindParam(':tipo_cuenta_bancaria', $tipo_cuenta_bancaria);
         $stmt->bindParam(':nro_cuenta_bancaria', $nro_cuenta_bancaria);
         $stmt->bindParam(':nombre_banco', $nombre_banco);
@@ -98,8 +100,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nro_cuenta_bancaria = $_POST['nro_cuenta_bancaria'];
         $nombre_banco = $_POST['nombre_banco'];
         $id_trabajador = $_POST['id_trabajador'];
-        $stmt = $conn->prepare("BEGIN MVCD_U_CUENTA_BANCARIA(:id_cuenta_bancaria,:tipo_cuenta_bancaria,:nro_cuenta_bancaria,:nombre_banco,:id_trabajador); END;");
+        $rut = $_POST['rut'];
+        $stmt = $conn->prepare("BEGIN MVCD_U_CUENTA_BANCARIA(:id_cuenta_bancaria,:rut,:tipo_cuenta_bancaria,:nro_cuenta_bancaria,:nombre_banco,:id_trabajador); END;");
         $stmt->bindParam(':id_cuenta_bancaria', $id_cuenta_bancaria);
+        $stmt->bindParam(':rut', $rut);
         $stmt->bindParam(':tipo_cuenta_bancaria', $tipo_cuenta_bancaria);
         $stmt->bindParam(':nro_cuenta_bancaria', $nro_cuenta_bancaria);
         $stmt->bindParam(':nombre_banco', $nombre_banco);
@@ -138,6 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 html = `
                     <form method="POST" action="cuentabancaria.php">
                         <input type="hidden" name="action" value="insertar">
+                        <label>RUT:</label>
+                        <input type="number" name="rut" required>
                         <label>Tipo de Cuenta Bancaria:</label>
                         <input type="text" name="tipo_cuenta_bancaria" required>
                         <label>Nombre del Banco:</label>
@@ -164,6 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="hidden" name="action" value="actualizar">
                         <label>ID de la Cuenta Bancaria a actualizar:</label>
                         <input type="number" name="id_cuenta_bancaria" required>
+                        <label>RUT:</label>
+                        <input type="number" name="rut" required>
                         <label>Nuevo Tipo de Cuenta Bancaria:</label>
                         <input type="text" name="tipo_cuenta_bancaria" required>
                         <label>Nuevo Nombre del Banco:</label>

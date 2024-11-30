@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id_pago_proveedor = $_POST['id_pago_proveedor'];
         $monto_pago_proveedor = $_POST['monto_pago_proveedor'];
         $id_proveedor = $_POST['id_proveedor'];
-        $stmt = $conn->prepare("BEGIN MVCD_U_PRODUCTO(:id_pago_proveedor,:monto_pago_proveedor,:id_proveedor); END;");
+        $stmt = $conn->prepare("BEGIN MVCD_U_PAGO_PROVEEDOR(:id_pago_proveedor,:monto_pago_proveedor,:id_proveedor); END;");
         $stmt->bindParam(':id_pago_proveedor', $id_pago_proveedor);
         $stmt->bindParam(':monto_pago_proveedor', $monto_pago_proveedor);
         $stmt->bindParam(':id_proveedor', $id_proveedor);

@@ -19,11 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Error de conexión: " . $e['message'];
             exit;
         }
-        $fecha = date('d-M-Y', strtotime($_POST['fecha']));
+        $cabecera = $_POST['cabecera'];
         // Llamada al procedimiento almacenado
-        $sql = "BEGIN MVCD_REPORTE_PAGO_PROVEEDOR(:fecha,:p_cursor); END;";
+        if (empty($cabecera)){
+            $cabecera = -1;
+        }
+        $sql = "BEGIN MVCD_REPORTE_PAGO_VENTAS(:p_cursor,:cabecera); END;";
         $stid = oci_parse($conn, $sql);
-        oci_bind_by_name($stid, ":fecha", $fecha);
+        oci_bind_by_name($stid, ":cabecera", $cabecera);
         // Crear cursor
         $cursor = oci_new_cursor($conn);
 
@@ -45,10 +48,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Mostrar resultados en una tabla HTML
         echo "<table id ='tableContainer' border='1'>";
-        echo "<tr><th>DINERO TOTAL EGRESADO DESDE LA FECHA $fecha</th></tr>";
+        if ($cabecera == -1){
+            echo "<tr><th>Reporte de ventas de todas las cabeceras </th><th>Fecha</th><th>Total</th><th>Trabajador</th><th>Cliente</th><th>Cantidad</th><th>Producto</th><th>Precio</th></tr>";
+        }else{
+            echo "<tr><th>Reporte de ventas de la cabecera $cabecera </th><th>Fecha</th><th>Total</th><th>Trabajador</th><th>Cliente</th><th>Cantidad</th><th>Producto</th><th>Precio</th></tr>";
+        }
         while ($row = oci_fetch_assoc($cursor)) {
             echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['SUM(MONTO_PAGO_PROVEEDOR)']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['CABECERA']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['FECHA_VENTA']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['TOTAL_VENTA']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['ID_TRABAJADOR']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['ID_CLIENTE']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['CANTIDAD_VENTA']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['NOMBRE_PRODUCTO']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['Precio']) . "</td>";
             echo "</tr>";
         }
         echo "</table>";
@@ -66,11 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REPORTE DE PAGOS PROVEEDOR</title>
+    <title>REPORTE DE VENTAS</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>REPORTE DE PAGOS PROVEEDOR</h1>
+    <h1>REPORTE DE VENTAS</h1>
     <div class="button-container">
         <button id  = "listar" onclick="showForm('filtrar')">Filtrar</button>
         <a href="admin.html"><button id = "volver">Volver</button></a>
@@ -84,10 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             let html = '';
             if (action === 'filtrar') {
                 html = `
-                    <form method="POST" action="func3.php">
+                    <form method="POST" action="func4.php">
                         <input type="hidden" name="action" value="listar">
-                        <label>Fecha desde la que se quiere filtrar:</label>
-                        <input type="date" name="fecha" required>
+                        <label>Cabecera para listar:</label>
+                        <input type="number" name="cabecera">
                         <button type="submit">Filtrar</button>
                     </form>
                 `;

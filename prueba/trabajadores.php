@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $correo_trabajador = $_POST['correo_trabajador'];
         $id_region = $_POST['id_region'];
         $id_rol = $_POST['id_rol'];
-        $stmt = $conn->prepare("BEGIN MVCD_U_TRABAJADOR(:id_trabajador,:nombre_trabajador,:apellido1_trabajador,:apellido2_trabajador,:telefono_trabajador,:correo_trabajador,:id_region,:id_rol); END;");
+        $stmt = $conn->prepare("BEGIN MVCD_U_TRABAJADOR(:id_trabajador,:nombre_trabajador,:apellido1_trabajador,:apellido2_trabajador,:telefono_trabajador,:correo_trabajador,:id_rol,:id_region); END;");
         $stmt->bindParam(':id_trabajador', $id_trabajador);
         $stmt->bindParam(':nombre_trabajador', $nombre_trabajador);
         $stmt->bindParam(':apellido1_trabajador', $apellido1_trabajador);
@@ -192,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label>Nuevo Teléfono del Trabajador:</label>
                         <input type="number" name="telefono_trabajador" required>
                         <label>Nuevo Correo del Trabajador:</label>
-                        <input type="text" name="correo" required>
+                        <input type="text" name="correo_trabajador" required>
                         <label>Nuevo ID Región del Trabajador:</label>
                         <input type="number" name="id_region" required>
                         <label>Nuevo ID Rol del Trabajador:</label>
