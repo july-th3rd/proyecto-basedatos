@@ -1594,14 +1594,14 @@ END;
 /
 
 --Procedimiento que actualiza el valor total de X cabecera
-CREATE OR REPLACE PROCEDURE MVCD_APLICAR_PROMOCION(ID_PROMOCION_F NUMBER,ID_CABECERA_VENTA_F NUMBER)
+CREATE OR REPLACE PROCEDURE MVCD_APLICAR_PROMOCION(ID_PROMOCION_P NUMBER,ID_CABECERA_VENTA_P NUMBER)
 IS
-    TOTAL_VENTA_F number := MVCD_APLICAR_PROMOCION_F(ID_PROMOCION_F,ID_CABECERA_VENTA_F);
+    TOTAL_VENTA_P number := MVCD_APLICAR_PROMOCION_F(ID_PROMOCION_P,ID_CABECERA_VENTA_P);
 BEGIN
     LOCK TABLE MVCD_CABECERA_VENTA IN ROW EXCLUSIVE MODE;
     UPDATE MVCD_CABECERA_VENTA 
-        SET TOTAL_VENTA = TOTAL_VENTA_F
-    WHERE ID_CABECERA_VENTA=ID_CABECERA_VENTA_F;
+        SET TOTAL_VENTA = TOTAL_VENTA_P
+    WHERE ID_CABECERA_VENTA=ID_CABECERA_VENTA_P;
     COMMIT;
     EXCEPTION
     WHEN PROGRAM_ERROR THEN
@@ -1652,27 +1652,24 @@ END;
 
 --Reporte de ventas, puede o no especificarse un id
 
-
-
-
-create or replace PROCEDURE MVCD_REPORTE_PAGO_VENTAS (p_cursor OUT SYS_REFCURSOR,ID_CABECERA_VENTA_P IN NUMBER) AS
+CREATE OR REPLACE PROCEDURE MVCD_REPORTE_PAGO_VENTAS (P_CURSOR OUT SYS_REFCURSOR,ID_CABECERA_VENTA_P IN NUMBER) AS
 BEGIN
 
     IF (ID_CABECERA_VENTA_P = -1) THEN
-        OPEN p_cursor FOR
-            select H.id_cabecera_venta as "Cabecera" , H.fecha_venta, H.total_venta, h.id_trabajador, h.id_cliente, C.cantidad_venta, P.nombre_producto 
-            from mvcd_cabecera_venta H 
-            join mvcd_cuerpo_venta C on (H.id_Cabecera_venta = c.id_cabecera_venta)
-            join mvcd_productos P on (P.id_producto = C.id_producto)
-            order by H.id_cabecera_venta; 
+        OPEN P_CURSOR FOR
+            SELECT H.ID_CABECERA_VENTA AS "CABECERA" , H.FECHA_VENTA, H.TOTAL_VENTA, H.ID_TRABAJADOR, H.ID_CLIENTE, C.CANTIDAD_VENTA, P.NOMBRE_PRODUCTO,P.PRECIO_PRODUCTO AS "Precio"
+            FROM MVCD_CABECERA_VENTA H 
+            JOIN MVCD_CUERPO_VENTA C ON (H.ID_CABECERA_VENTA = C.ID_CABECERA_VENTA)
+            JOIN MVCD_PRODUCTOS P ON (P.ID_PRODUCTO = C.ID_PRODUCTO)
+            ORDER BY H.ID_CABECERA_VENTA; 
 
     ELSE
-        OPEN p_cursor FOR
-            select H.id_cabecera_venta as "Cabecera" , H.fecha_venta, H.total_venta, h.id_trabajador, h.id_cliente, C.cantidad_venta, P.nombre_producto 
-            from mvcd_cabecera_venta H 
-            join mvcd_cuerpo_venta C on (H.id_Cabecera_venta = c.id_cabecera_venta)
-            join mvcd_productos P on (P.id_producto = C.id_producto)
-            WHERE H.id_cabecera_venta = ID_CABECERA_VENTA_P
-            order by H.id_cabecera_venta;
+        OPEN P_CURSOR FOR
+            SELECT H.ID_CABECERA_VENTA AS "CABECERA" , H.FECHA_VENTA, H.TOTAL_VENTA, H.ID_TRABAJADOR, H.ID_CLIENTE, C.CANTIDAD_VENTA, P.NOMBRE_PRODUCTO,P.PRECIO_PRODUCTO AS "Precio"
+            FROM MVCD_CABECERA_VENTA H 
+            JOIN MVCD_CUERPO_VENTA C ON (H.ID_CABECERA_VENTA = C.ID_CABECERA_VENTA)
+            JOIN MVCD_PRODUCTOS P ON (P.ID_PRODUCTO = C.ID_PRODUCTO)
+            WHERE H.ID_CABECERA_VENTA = ID_CABECERA_VENTA_P
+            ORDER BY H.ID_CABECERA_VENTA;
     END IF;
 END;
