@@ -49,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "<tr><th>CANTIDAD DE PRODUCTO VENDIDO</th><th>NOMBRE DEL PRODUCTO</th></tr>";
         while ($row = oci_fetch_assoc($cursor)) {
             echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['COUNT(C.ID_PRODUCTO)']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['P.NOMBRE_PRODUCTO']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['SUM(C.CANTIDAD_VENTA*C.ID_PRODUCTO)']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['NOMBRE_PRODUCTO']) . "</td>";
             echo "</tr>";
         }
         echo "</table>";
